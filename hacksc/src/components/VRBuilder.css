@@ -1,0 +1,34 @@
+.{
+    background-color: black;
+}
+
+.web-screen-partition {
+    display: flex;
+    height: 100vh; /* Set height of screen partition */
+}
+
+.web-left-section {
+    flex: 2; /* Take up 2/3 of the screen width */
+    background-color: #282c34;
+}
+
+.web-right-section {
+    flex: 1;
+    background-color:#000000;
+    font-size: calc(10px + 2vmin);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.button {
+    background-color: black;
+    color: white;
+    font-size: 30px;
+    padding: 15px 150px; /* first val is top and bot pad, 2nd val is left and right pad */
+    border-radius: 8px;
+    margin: 100px 0px;
+    cursor: pointer;
+} 
