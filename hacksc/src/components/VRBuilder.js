@@ -23,10 +23,15 @@ import {
 
 function VRBuilder() {
     const ThreeScene = () => {
+        
         const scene = useRef(new THREE.Scene());
-        const camera = useRef(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000));
+        const camera = useRef(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000));
         const renderer = useRef(new THREE.WebGLRenderer());
-      
+
+        var objects = [];
+        
+        // init();
+        // animate();
         const mount = useRef(null);
       
         useEffect(() => {
@@ -34,9 +39,26 @@ function VRBuilder() {
           const { current: rendererInstance } = renderer;
           const { current: sceneInstance } = scene;
       
+          // renderer = new THREE.WebGLRenderer( { antialias: true } );
           rendererInstance.setSize(window.innerWidth, window.innerHeight);
           mount.current.appendChild(rendererInstance.domElement);
       
+          const orbitControls = new OrbitControls(cameraInstance, rendererInstance.domElement);
+		
+          const dragControls = new DragControls(objects, cameraInstance, rendererInstance.domElement);
+          dragControls.addEventListener( 'dragstart', function () { orbitControls.enabled = false; } );
+          dragControls.addEventListener( 'dragend', function () { orbitControls.enabled = true; } );
+  
+          const axesHelper = new THREE.AxesHelper(5);
+          sceneInstance.add(axesHelper);
+
+          var boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+          var boxMaterial = new THREE.MeshNormalMaterial();
+      
+          var mesh = new THREE.Mesh( boxGeometry, boxMaterial );
+          sceneInstance.add( mesh );
+              objects.push( mesh );
+
           const geometry = new THREE.BoxGeometry();
           const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
           const cube = new THREE.Mesh(geometry, material);
