@@ -32,3 +32,19 @@
     margin: 100px 0px;
     cursor: pointer;
 } 
+
+.input-box {
+    text-align: center;
+    margin: 20px;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .output-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
