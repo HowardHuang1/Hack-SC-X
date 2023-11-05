@@ -2976,7 +2976,8 @@ sphere.position.set(10, 10, 0);
 const gui = new _datGui.GUI();
 const options = {
     sphereColor: "#ffea00",
-    wireframe: false
+    wireframe: false,
+    speed: 0.01
 };
 gui.addColor(options, "sphereColor").onChange(function(e) {
     sphere.material.color.set(e);
@@ -2984,9 +2985,13 @@ gui.addColor(options, "sphereColor").onChange(function(e) {
 gui.add(options, "wireframe").onChange(function(e) {
     sphere.material.wireframe = e;
 });
-function animate() {
-    box.rotation.x += 0.01;
-    box.rotation.y += 0.01;
+gui.add(options, "speed", 0, 0.1);
+let step = 0;
+function animate(time) {
+    box.rotation.x = time / 1000;
+    box.rotation.y = time / 1000;
+    step += options.speed;
+    sphere.position.y = 10 * Math.abs(Math.sin(step));
     renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);
