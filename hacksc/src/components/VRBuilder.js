@@ -12,6 +12,9 @@ import {
     Textarea,
     Input,
     IconButton,
+    Text,
+    Checkbox,
+    Stack,
     Button,
   } from "@chakra-ui/react";
 
@@ -21,7 +24,16 @@ import {
   import * as dat from 'dat.gui';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
+
+
 function VRBuilder() {
+  const [selectedItems, setSelectedItems] = useState([]);
+  useEffect(() => {
+    // This will be triggered whenever selectedItems changes
+    console.log('Selected items:', selectedItems);
+    const urls = loadURLs(selectedItems);
+  }, [selectedItems]);
+  
     const ThreeScene = () => {
         const scene = useRef(new THREE.Scene());
         const camera = useRef(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000));
@@ -85,28 +97,97 @@ function VRBuilder() {
           var boxMaterial = new THREE.MeshNormalMaterial();
       
           var mesh = new THREE.Mesh( boxGeometry, boxMaterial );
-          sceneInstance.add( mesh );
-              objects.push( mesh );
+          // sceneInstance.add( mesh );
+          //     objects.push( mesh );
 
-              const nycURL = new URL('./threeJS/assets/model-0-0.glb', import.meta.url);
+              const nycURL = new URL('./threeJS/assets/google3DTiles.glb', import.meta.url);
               const assetLoader = new GLTFLoader();
           
         // takes a while to load
         assetLoader.load(nycURL.href, function(gltf){
             const model = gltf.scene;
             sceneInstance.add(model);
-            model.position.set(-100, -100, -100);
+            model.position.set(-170, 0, 100);
         }, undefined, function(error){
             console.error(error);
         });
+
+        const openURL = new URL("./threeJS/assets/tree.glb", import.meta.url);
+          
+          assetLoader.load(openURL.href, function(gltf){
+              const model = gltf.scene;
+              sceneInstance.add(model);
+              model.position.set(-10, 0, 0);
+              model.scale.set(15, 15, 15);  // Scale the model to be 10 times larger
+          }, undefined, function(error){
+              console.error(error);
+          });
+
+          assetLoader.load(openURL.href, function(gltf){
+            const model = gltf.scene;
+            sceneInstance.add(model);
+            model.position.set(-10, 0, 4);
+            // model.scale.set(15, 15, 15);  // Scale the model to be 10 times larger
+
+            const treeDimensions = {
+              length: 15,
+              width: 15,
+              height: 15,
+            };
+
+            const gui = new dat.GUI();
+            
+          // Create a folder in the GUI for cube dimensions
+          const treeDimensionFolder = gui.addFolder('Tree Dimensions');
+          
+          // Add sliders for adjusting length, width, and height
+          treeDimensionFolder.add(treeDimensions, 'length', 0.1, 30).onChange(function(value) {
+          model.scale.x = value;
+          });
+          treeDimensionFolder.add(treeDimensions, 'width', 0.1, 30).onChange(function(value) {
+            model.scale.y = value;
+          });
+          treeDimensionFolder.add(treeDimensions, 'height', 0.1, 30).onChange(function(value) {
+            model.scale.z = value;
+          });
+        }, undefined, function(error){
+            console.error(error);
+        });
+
+
+
+        const solarURL = new URL("./threeJS/assets/solarPanel.glb", import.meta.url);
+          
+        assetLoader.load(solarURL.href, function(gltf){
+            const model = gltf.scene;
+            sceneInstance.add(model);
+            model.position.set(-10, 0, 10);
+            model.scale.set(15, 15, 15);  // Scale the model to be 10 times larger
+            objects.push(model);
+        }, undefined, function(error){
+            console.error(error);
+        });
+
+        // urls.map((url, index) => {
+          const houseURL = new URL("./threeJS/assets/modernHouse.glb", import.meta.url);
+          
+          assetLoader.load(houseURL.href, function(gltf){
+              const model = gltf.scene;
+              sceneInstance.add(model);
+              model.position.set(0, 5, 0);
+              model.scale.set(20, 20, 20);  // Scale the model to be 10 times larger
+          }, undefined, function(error){
+              console.error(error);
+          });
+        // })
 
         cameraInstance.position.z = 5;
 
         const cubeGeometry = new THREE.BoxGeometry(4, 8, 10);
         const material = new THREE.MeshNormalMaterial();
         const cube = new THREE.Mesh(cubeGeometry, material);
-        sceneInstance.add(cube)
-        cube.position.set(-10, 10, 0);
+        // sceneInstance.add(cube)
+        // cube.position.set(-10, 10, 0);
 
         const options = {
             cubeColor: '#ffea00',
@@ -152,7 +233,25 @@ function VRBuilder() {
         return (
             <div ref={mount} />
         );
+    };  
+
+    
+  
+    const handleCheckboxChange = (event) => {
+      const { value, checked } = event.target;
+      setSelectedItems((prevSelectedItems) => {
+        if (checked) {
+          return [...prevSelectedItems, value];
+        } else {
+          return prevSelectedItems.filter(item => item !== value);
+        }
+      });
     };
+
+    const score = (selectedItems.length / 6) * 100;
+    const scoreColor = score < 50 ? 'red' : 'green';
+
+
     ///////
     const [response, setResponse] = useState("");
     const [textPrompt, setTextPrompt] = useState('');
@@ -277,7 +376,16 @@ function VRBuilder() {
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4} bg="black" color="white">
-                  <Input p={"5px"} type="file" />
+                  <Stack spacing={3}>
+                    {['tree', 'bush', 'flowerBed', 'solarPanel', 'windTurbine', 'heatPump'].map(value => (
+                      <Checkbox key={value} value={value} onChange={handleCheckboxChange}>
+                        {capitalizeFirstLetter(value)}
+                      </Checkbox>
+                    ))}
+                  </Stack>
+                  <Text fontSize="2xl" color={scoreColor}>
+                    Environmental Score: {score}
+                  </Text>
                 </AccordionPanel>
               </AccordionItem>
 
@@ -302,5 +410,15 @@ function VRBuilder() {
     </div>
   )
 }
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+function loadURLs(selectedItems) {
+  const urls = selectedItems.map(item => `./threeJS/assets/${item}.glb`);
+  // Load these URLs or do whatever you need with them
+  return urls;
+}
+
 
 export default VRBuilder
