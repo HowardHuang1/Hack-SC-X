@@ -1,9 +1,12 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'dat.gui'
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import laCity from './img/laCity.jpg';
 import laCity2 from './img/laCity2.jpg';
+
+const nycURL = new URL('./assets/model-0-0.glb', import.meta.url);
 
 const renderer = new THREE.WebGLRenderer();
 
@@ -101,6 +104,16 @@ const box2Material = new THREE.MeshBasicMaterial({color: 0x00FF00});
 const box2 = new THREE.Mesh(box2Geometry, box2Material);
 scene.add(box2);
 box2.position.set(0, 15, 10);
+
+const assetLoader = new GLTFLoader();
+
+assetLoader.load(nycURL.href, function(gltf){
+    const model = gltf.scene;
+    scene.add(model);
+    model.position.set(-100, -100, -100);
+}, undefined, function(error){
+    console.error(error);
+});
 
 const gui = new dat.GUI();
 
