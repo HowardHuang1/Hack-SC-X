@@ -89,6 +89,7 @@ function VRBuilder() {
               const nycURL = new URL('./threeJS/assets/model-0-0.glb', import.meta.url);
               const assetLoader = new GLTFLoader();
           
+        // takes a while to load
         assetLoader.load(nycURL.href, function(gltf){
             const model = gltf.scene;
             sceneInstance.add(model);
@@ -97,12 +98,50 @@ function VRBuilder() {
             console.error(error);
         });
 
-          const geometry = new THREE.BoxGeometry();
-          const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-          const cube = new THREE.Mesh(geometry, material);
-          sceneInstance.add(cube);
-      
-          cameraInstance.position.z = 5;
+        const cubeGeometry = new THREE.BoxGeometry(4, 8, 10);
+        const material = new THREE.MeshNormalMaterial();
+        const cube = new THREE.Mesh(cubeGeometry, material);
+        sceneInstance.add(cube)
+        cube.position.set(-10, 10, 0);
+
+        
+        const gui = new dat.GUI();
+
+        const options = {
+            cubeColor: '#ffea00',
+            wireframe: false,
+            speed: 0.01
+        };
+
+        gui.addColor(options, 'cubeColor').onChange(function(e){
+            cube.material.color.set(e);
+        });
+
+        gui.add(options, 'wireframe').onChange(function(e){
+            cube.material.wireframe = e;
+        });
+
+        gui.add(options, 'speed', 0, 0.1);
+
+        const cubeDimensions = {
+            length: 1,
+            width: 1,
+            height: 1,
+          };
+          
+        // Create a folder in the GUI for cube dimensions
+        const cubeDimensionFolder = gui.addFolder('Cube Dimensions');
+        
+        // Add sliders for adjusting length, width, and height
+        cubeDimensionFolder.add(cubeDimensions, 'length', 0.1, 3).onChange(function(value) {
+        cube.scale.x = value;
+        });
+        cubeDimensionFolder.add(cubeDimensions, 'width', 0.1, 3).onChange(function(value) {
+        cube.scale.y = value;
+        });
+        cubeDimensionFolder.add(cubeDimensions, 'height', 0.1, 3).onChange(function(value) {
+        cube.scale.z = value;
+        });
       
           const animate = () => {
             requestAnimationFrame(animate);
