@@ -2941,6 +2941,7 @@ var _three = require("three");
 var _orbitControlsJs = require("three/examples/jsm/controls/OrbitControls.js");
 var _datGui = require("dat.gui");
 var _gltfloaderJs = require("three/examples/jsm/loaders/GLTFLoader.js");
+var _dragControlsJs = require("three/examples/jsm/controls/DragControls.js");
 var _laCityJpg = require("./img/laCity.jpg");
 var _laCityJpgDefault = parcelHelpers.interopDefault(_laCityJpg);
 var _laCity2Jpg = require("./img/laCity2.jpg");
@@ -3049,6 +3050,43 @@ window.addEventListener("mousemove", function(e) {
 const rayCaster = new _three.Raycaster();
 const sphereId = sphere.id;
 box2.name = "theBox";
+////////////////
+// var scene = new THREE.Scene();
+// scene.background = new THREE.Color (0xf0f0f0)
+// var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+// var renderer = new THREE.WebGLRenderer();
+// renderer.setSize(window.innerWidth, window.innerHeight);
+// document.body.appendChild(renderer.domElement);
+// camera.position.z = 1000;
+var objects = [];
+function init() {
+    var ambientLight = new _three.AmbientLight(0x0f0f0f);
+    scene.add(ambientLight);
+    var light = new _three.SpotLight(0xffffff, 1.5);
+    light.position.set(0, 500, 2000);
+    scene.add(light);
+    var geometry = new _three.SphereGeometry(40, 40, 40);
+    for(var i = 0; i < 20; i++){
+        var object = new _three.Mesh(geometry, new _three.MeshLambertMaterial({
+            color: Math.random() * 0xffffff
+        }));
+        object.position.x = Math.random() * 1000 - 500;
+        object.position.y = Math.random() * 600 - 300;
+        object.position.z = Math.random() * 800 - 400;
+        object.castShadow = true;
+        object.receiveShadow = true;
+        scene.add(object);
+        objects.push(object);
+    }
+// var controls = new THREE.DragControls(objects, camera, renderer.domElement);
+}
+function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+}
+init();
+animate();
+///////////////
 function animate(time) {
     box.rotation.x = time / 1000;
     box.rotation.y = time / 1000;
@@ -3077,7 +3115,7 @@ window.addEventListener("resize", function() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls.js":"7mqRv","dat.gui":"67ss8","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","./img/laCity.jpg":"cnx4k","./img/laCity2.jpg":"jBe0V","d3aa0f27b6e11745":"9UJEN","@parcel/transformer-js/src/esmodule-helpers.js":"eGNrI"}],"ktPTu":[function(require,module,exports) {
+},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls.js":"7mqRv","dat.gui":"67ss8","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","three/examples/jsm/controls/DragControls.js":"4ZWqt","./img/laCity.jpg":"cnx4k","./img/laCity2.jpg":"jBe0V","d3aa0f27b6e11745":"9UJEN","@parcel/transformer-js/src/esmodule-helpers.js":"eGNrI"}],"ktPTu":[function(require,module,exports) {
 /**
  * @license
  * Copyright 2010-2023 Three.js Authors
@@ -39339,6 +39377,143 @@ function mergeBufferGeometries(geometries, useGroups = false) {
 function mergeBufferAttributes(attributes) {
     console.warn("THREE.BufferGeometryUtils: mergeBufferAttributes() has been renamed to mergeAttributes()."); // @deprecated, r151
     return mergeAttributes(attributes);
+}
+
+},{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"eGNrI"}],"4ZWqt":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "DragControls", ()=>DragControls);
+var _three = require("three");
+const _plane = new (0, _three.Plane)();
+const _raycaster = new (0, _three.Raycaster)();
+const _pointer = new (0, _three.Vector2)();
+const _offset = new (0, _three.Vector3)();
+const _intersection = new (0, _three.Vector3)();
+const _worldPosition = new (0, _three.Vector3)();
+const _inverseMatrix = new (0, _three.Matrix4)();
+class DragControls extends (0, _three.EventDispatcher) {
+    constructor(_objects, _camera, _domElement){
+        super();
+        _domElement.style.touchAction = "none"; // disable touch scroll
+        let _selected = null, _hovered = null;
+        const _intersections = [];
+        //
+        const scope = this;
+        function activate() {
+            _domElement.addEventListener("pointermove", onPointerMove);
+            _domElement.addEventListener("pointerdown", onPointerDown);
+            _domElement.addEventListener("pointerup", onPointerCancel);
+            _domElement.addEventListener("pointerleave", onPointerCancel);
+        }
+        function deactivate() {
+            _domElement.removeEventListener("pointermove", onPointerMove);
+            _domElement.removeEventListener("pointerdown", onPointerDown);
+            _domElement.removeEventListener("pointerup", onPointerCancel);
+            _domElement.removeEventListener("pointerleave", onPointerCancel);
+            _domElement.style.cursor = "";
+        }
+        function dispose() {
+            deactivate();
+        }
+        function getObjects() {
+            return _objects;
+        }
+        function getRaycaster() {
+            return _raycaster;
+        }
+        function onPointerMove(event) {
+            if (scope.enabled === false) return;
+            updatePointer(event);
+            _raycaster.setFromCamera(_pointer, _camera);
+            if (_selected) {
+                if (_raycaster.ray.intersectPlane(_plane, _intersection)) _selected.position.copy(_intersection.sub(_offset).applyMatrix4(_inverseMatrix));
+                scope.dispatchEvent({
+                    type: "drag",
+                    object: _selected
+                });
+                return;
+            }
+            // hover support
+            if (event.pointerType === "mouse" || event.pointerType === "pen") {
+                _intersections.length = 0;
+                _raycaster.setFromCamera(_pointer, _camera);
+                _raycaster.intersectObjects(_objects, scope.recursive, _intersections);
+                if (_intersections.length > 0) {
+                    const object = _intersections[0].object;
+                    _plane.setFromNormalAndCoplanarPoint(_camera.getWorldDirection(_plane.normal), _worldPosition.setFromMatrixPosition(object.matrixWorld));
+                    if (_hovered !== object && _hovered !== null) {
+                        scope.dispatchEvent({
+                            type: "hoveroff",
+                            object: _hovered
+                        });
+                        _domElement.style.cursor = "auto";
+                        _hovered = null;
+                    }
+                    if (_hovered !== object) {
+                        scope.dispatchEvent({
+                            type: "hoveron",
+                            object: object
+                        });
+                        _domElement.style.cursor = "pointer";
+                        _hovered = object;
+                    }
+                } else if (_hovered !== null) {
+                    scope.dispatchEvent({
+                        type: "hoveroff",
+                        object: _hovered
+                    });
+                    _domElement.style.cursor = "auto";
+                    _hovered = null;
+                }
+            }
+        }
+        function onPointerDown(event) {
+            if (scope.enabled === false) return;
+            updatePointer(event);
+            _intersections.length = 0;
+            _raycaster.setFromCamera(_pointer, _camera);
+            _raycaster.intersectObjects(_objects, scope.recursive, _intersections);
+            if (_intersections.length > 0) {
+                _selected = scope.transformGroup === true ? _objects[0] : _intersections[0].object;
+                _plane.setFromNormalAndCoplanarPoint(_camera.getWorldDirection(_plane.normal), _worldPosition.setFromMatrixPosition(_selected.matrixWorld));
+                if (_raycaster.ray.intersectPlane(_plane, _intersection)) {
+                    _inverseMatrix.copy(_selected.parent.matrixWorld).invert();
+                    _offset.copy(_intersection).sub(_worldPosition.setFromMatrixPosition(_selected.matrixWorld));
+                }
+                _domElement.style.cursor = "move";
+                scope.dispatchEvent({
+                    type: "dragstart",
+                    object: _selected
+                });
+            }
+        }
+        function onPointerCancel() {
+            if (scope.enabled === false) return;
+            if (_selected) {
+                scope.dispatchEvent({
+                    type: "dragend",
+                    object: _selected
+                });
+                _selected = null;
+            }
+            _domElement.style.cursor = _hovered ? "pointer" : "auto";
+        }
+        function updatePointer(event) {
+            const rect = _domElement.getBoundingClientRect();
+            _pointer.x = (event.clientX - rect.left) / rect.width * 2 - 1;
+            _pointer.y = -(event.clientY - rect.top) / rect.height * 2 + 1;
+        }
+        activate();
+        // API
+        this.enabled = true;
+        this.recursive = true;
+        this.transformGroup = false;
+        this.activate = activate;
+        this.deactivate = deactivate;
+        this.dispose = dispose;
+        this.getObjects = getObjects;
+        this.getRaycaster = getRaycaster;
+    }
 }
 
 },{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"eGNrI"}],"cnx4k":[function(require,module,exports) {

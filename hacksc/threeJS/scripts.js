@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'dat.gui'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {DragControls} from 'three/examples/jsm/controls/DragControls.js';
 
 import laCity from './img/laCity.jpg';
 import laCity2 from './img/laCity2.jpg';
@@ -146,6 +147,54 @@ const rayCaster = new THREE.Raycaster();
 
 const sphereId = sphere.id;
 box2.name = 'theBox';
+
+////////////////
+// var scene = new THREE.Scene();
+// scene.background = new THREE.Color (0xf0f0f0)
+// var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+// var renderer = new THREE.WebGLRenderer();
+// renderer.setSize(window.innerWidth, window.innerHeight);
+// document.body.appendChild(renderer.domElement);
+
+// camera.position.z = 1000;
+var objects = [];
+
+function init(){
+    var ambientLight = new THREE.AmbientLight(0x0f0f0f);
+    scene.add(ambientLight);
+
+    var light = new THREE.SpotLight(0xffffff, 1.5);
+    light.position.set(0, 500, 2000);
+
+    scene.add(light);
+
+    var geometry = new THREE.SphereGeometry( 40, 40, 40);
+
+    for(var i = 0; i < 20; i++){
+        var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff}));
+
+        object.position.x = Math.random() * 1000 - 500;
+        object.position.y = Math.random() * 600 - 300;
+        object.position.z = Math.random() * 800 - 400;
+
+        object.castShadow = true;
+        object.receiveShadow = true;
+
+        scene.add(object);
+
+        objects.push(object);
+    }
+    // var controls = new THREE.DragControls(objects, camera, renderer.domElement);
+}
+function animate(){
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+}
+
+init();
+animate();
+///////////////
 
 function animate(time){
     box.rotation.x = time / 1000;
