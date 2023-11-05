@@ -15,7 +15,8 @@ function init() {
     const nycURL = new URL('./assets/model-0-0.glb', import.meta.url);
 
     camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 1000 );
-    camera.position.z = 1;
+    camera.position.z = 10;
+    camera.position.y = 30;
 
     scene = new THREE.Scene();
 
@@ -51,6 +52,11 @@ function init() {
         });
         const box = new THREE.Mesh(boxGeometry, boxMaterial);
         scene.add(box);
+
+        const cubeGeometry = new THREE.BoxGeometry(4, 8, 10);
+        const cube = new THREE.Mesh(cubeGeometry, material);
+        scene.add(cube)
+        cube.position.set(-10, 10, 0);
 
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
         scene.add(plane);
@@ -102,6 +108,35 @@ function init() {
         });
 
         gui.add(options, 'speed', 0, 0.1);
+
+        const cubeDimensions = {
+            length: 1,
+            width: 1,
+            height: 1,
+          };
+          
+        // Create a folder in the GUI for cube dimensions
+        const cubeDimensionFolder = gui.addFolder('Cube Dimensions');
+        
+        // Add sliders for adjusting length, width, and height
+        cubeDimensionFolder.add(cubeDimensions, 'length', 0.1, 3).onChange(function(value) {
+        cube.scale.x = value;
+        });
+        cubeDimensionFolder.add(cubeDimensions, 'width', 0.1, 3).onChange(function(value) {
+        cube.scale.y = value;
+        });
+        cubeDimensionFolder.add(cubeDimensions, 'height', 0.1, 3).onChange(function(value) {
+        cube.scale.z = value;
+        });
+
+        const cubeFolder = gui.addFolder('Cube')
+        cubeFolder.add(cube.rotation, 'x', 0, Math.PI * 2)
+        cubeFolder.add(cube.rotation, 'y', 0, Math.PI * 2)
+        cubeFolder.add(cube.rotation, 'z', 0, Math.PI * 2)
+        cubeFolder.open()
+        const cameraFolder = gui.addFolder('Camera')
+        cameraFolder.add(camera.position, 'z', 0, 10)
+        cameraFolder.open()
 }
 
 function animate() {
