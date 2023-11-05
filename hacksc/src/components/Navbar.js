@@ -12,6 +12,9 @@ function Navbar() {
         <li className="nav-item">
           <Link to="/vrbuilder">VRBuilder</Link>
         </li>
+        <li className="nav-item">
+            <Link to="/threejs">ThreeJS</Link>
+        </li>
       </ul>
     </nav>
   );

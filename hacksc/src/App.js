@@ -4,6 +4,7 @@ import "./App.css"
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import VRBuilder from './components/VRBuilder';
+import ThreeJS from './components/ThreeJS';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route path="/vrbuilder" element={<VRBuilder />} />
+          <Route path="/threejs" element={<ThreeJS />} />
         </Routes>
       </div>
     </Router>
