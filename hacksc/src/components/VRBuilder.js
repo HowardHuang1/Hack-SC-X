@@ -30,6 +30,10 @@ function VRBuilder() {
         var objects = [];
         
         const mount = useRef(null);
+
+        const gui = new dat.GUI();
+        // Create a folder in the GUI for cube dimensions
+        const cubeDimensionFolder = gui.addFolder('Cube Dimensions');
       
         useEffect(() => {
           const { current: cameraInstance } = camera;
@@ -104,9 +108,6 @@ function VRBuilder() {
         sceneInstance.add(cube)
         cube.position.set(-10, 10, 0);
 
-        
-        const gui = new dat.GUI();
-
         const options = {
             cubeColor: '#ffea00',
             wireframe: false,
@@ -128,9 +129,6 @@ function VRBuilder() {
             width: 1,
             height: 1,
           };
-          
-        // Create a folder in the GUI for cube dimensions
-        const cubeDimensionFolder = gui.addFolder('Cube Dimensions');
         
         // Add sliders for adjusting length, width, and height
         cubeDimensionFolder.add(cubeDimensions, 'length', 0.1, 3).onChange(function(value) {
@@ -162,8 +160,19 @@ function VRBuilder() {
         setTextPrompt(event.target.value);
     };
 
-    const handleSendMessage = (text) => {
+    const handleSendMessage = async (text) => {
         // call server here
+        const response = await fetch('/submit-prompt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt }),
+        });
+        if(response.ok){
+            const result = await response.json();
+            console.log('Python script response:', result);
+        }
         console.log(text);
         setTextPrompt(""); // clear message so that it looks like it has been submitted
     };
