@@ -4,7 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 # generation_text = "2 story victorian house"
-sleep_factor = 1.5
+sleep_factor = 1.2
 
 def generate_asset(text):
     # Enter prompt
@@ -22,13 +22,16 @@ def generate_asset(text):
     # Click option 4
     buttons = driver.find_elements(By.CLASS_NAME, "emoji")
     buttons[-2].click()
-    sleep(6*sleep_factor)
+    sleep(3*sleep_factor)
 
     # Download to downloads/
-    driver.switch_to.window(driver.window_handles[1])        
+    driver.switch_to.window(driver.window_handles[1])
+    # driver.refresh()
+    sleep(6*sleep_factor)
     buttons = driver.find_elements(By.CLASS_NAME, "lucide")
     buttons[0].click()
     sleep(1*sleep_factor)
+    driver.close()
     driver.switch_to.window(driver.window_handles[0])
 
 # Open browser

@@ -22,6 +22,19 @@ construction_features = {
     "daylighting systems"
 }
 
+nature_features = {
+    "tree",
+    "bush",
+    "flower bed",
+    "patio",
+    "gazebo",
+    "garden sculpture",
+    "vegetable garden",
+    "herb garden",
+    "hedge",
+    "fountain"
+}
+
 features = ["daylighting systems", "composting"]
 max_score = 100
 score = 0
