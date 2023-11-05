@@ -15,52 +15,49 @@ import {
     Button,
   } from "@chakra-ui/react";
 
-import * as THREE from 'three';
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+  import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
+  import * as dat from 'dat.gui';
+  import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 function VRBuilder() {
     const ThreeScene = () => {
         const scene = useRef(new THREE.Scene());
         const camera = useRef(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000));
         const renderer = useRef(new THREE.WebGLRenderer());
-        
+      
         const mount = useRef(null);
-        
+      
         useEffect(() => {
-            const { current: cameraInstance } = camera;
-            const { current: rendererInstance } = renderer;
-            const { current: sceneInstance } = scene;
-        
-            rendererInstance.setSize(window.innerWidth, window.innerHeight);
-            mount.current.appendChild(rendererInstance.domElement);
-        
-            const geometry = new THREE.BoxGeometry();
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            const cube = new THREE.Mesh(geometry, material);
-            sceneInstance.add(cube);
-        
-            cameraInstance.position.z = 5;
-        
-            const animate = () => {
+          const { current: cameraInstance } = camera;
+          const { current: rendererInstance } = renderer;
+          const { current: sceneInstance } = scene;
+      
+          rendererInstance.setSize(window.innerWidth, window.innerHeight);
+          mount.current.appendChild(rendererInstance.domElement);
+      
+          const geometry = new THREE.BoxGeometry();
+          const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+          const cube = new THREE.Mesh(geometry, material);
+          sceneInstance.add(cube);
+      
+          cameraInstance.position.z = 5;
+      
+          const animate = () => {
             requestAnimationFrame(animate);
             cube.rotation.x += 0.01;
             cube.rotation.y += 0.01;
             rendererInstance.render(sceneInstance, cameraInstance);
-            };
-        
-            animate();
+          };
+      
+          animate();
         }, []);
-        
+      
         return (
-            <div
-              style={{
-                width: '66.67%', // 2/3 of the page width
-                float: 'left',   // Left-aligned
-              }}
-              ref={mount}
-            />
+            <div ref={mount} />
         );
     };
-
     ///////
     const [response, setResponse] = useState("");
     const [textPrompt, setTextPrompt] = useState('');
@@ -76,7 +73,11 @@ function VRBuilder() {
 
   return (
     <div className="web-screen-partition">
-        <div className="web-left-section">
+        <div className="web-left-section"               style={{
+                width: '66.67%',  // 2/3 of the page width
+                float: 'left',    // Left-aligned
+                height: '100vh',  // Full height
+              }}>
             <ThreeScene />
         </div>
         <div className="web-right-section">
