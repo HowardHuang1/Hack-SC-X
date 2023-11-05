@@ -1,23 +1,27 @@
-// server.js
-const express = require('express');
+const express = require("express");
 const { spawn } = require('child_process');
+const bodyParser = require("body-parser");
+const cors = require("cors");
+
 const app = express();
 const port = 3001;
 
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(cors());
 
-app.post('/submit-prompt', (req, res) => {
-  const { prompt } = req.body;
+app.post("/", async (req, res) => {
+    const { prompt } = req.body;
+    console.log("prompt is: " + prompt);
 
-  // Call the Python script
-  const pythonProcess = spawn('python', ['./selenium_test.py', prompt]);
+    const pythonProcess = spawn('python', ['./selenium_test.py', prompt]);
 
-  pythonProcess.stdout.on('data', (data) => {
-    const result = data.toString();
-    res.json({ result });
-  });
+    pythonProcess.stdout.on('data', (data) => {
+        const result = data.toString();
+        res.json({result});
+    });
+    console.log(result);
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server listening at http://localhost:${port}`);
 });

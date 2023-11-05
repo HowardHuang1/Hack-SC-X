@@ -160,9 +160,9 @@ function VRBuilder() {
         setTextPrompt(event.target.value);
     };
 
-    const handleSendMessage = async (text) => {
+    const handleSendMessage = async (prompt) => {
         // call server here
-        const response = await fetch('/submit-prompt', {
+        const response = await fetch('http://localhost:3001', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -171,9 +171,11 @@ function VRBuilder() {
         });
         if(response.ok){
             const result = await response.json();
-            console.log('Python script response:', result);
+            // no response needed
+            // console.log('Python script response:', result);
+            console.log('Done, Python script finished running');
         }
-        console.log(text);
+        console.log(prompt);
         setTextPrompt(""); // clear message so that it looks like it has been submitted
     };
 
