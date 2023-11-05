@@ -2936,9 +2936,14 @@ process.umask = function() {
 };
 
 },{}],"luGQm":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _three = require("three");
 var _orbitControlsJs = require("three/examples/jsm/controls/OrbitControls.js");
 var _datGui = require("dat.gui");
+var _laCityJpg = require("./img/laCity.jpg");
+var _laCityJpgDefault = parcelHelpers.interopDefault(_laCityJpg);
+var _laCity2Jpg = require("./img/laCity2.jpg");
+var _laCity2JpgDefault = parcelHelpers.interopDefault(_laCity2Jpg);
 const renderer = new _three.WebGLRenderer();
 renderer.shadowMap.enabled = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -2991,6 +2996,18 @@ scene.add(dLightShadowHelper);
 // scene.add(spotLight);
 // spotLight.position.set(-100, 100, 0);
 // spotLight.castShadow = true;
+// renderer.setClearColor(0xFFEA00);
+const textureLoader = new _three.TextureLoader();
+// scene.background = textureLoader.load(laCity);
+const cubeTextureLoader = new _three.CubeTextureLoader();
+scene.background = cubeTextureLoader.load([
+    (0, _laCityJpgDefault.default),
+    (0, _laCity2JpgDefault.default),
+    (0, _laCityJpgDefault.default),
+    (0, _laCity2JpgDefault.default),
+    (0, _laCityJpgDefault.default),
+    (0, _laCity2JpgDefault.default)
+]);
 const gui = new _datGui.GUI();
 const options = {
     sphereColor: "#ffea00",
@@ -3014,7 +3031,7 @@ function animate(time) {
 }
 renderer.setAnimationLoop(animate);
 
-},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls.js":"7mqRv","dat.gui":"67ss8"}],"ktPTu":[function(require,module,exports) {
+},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls.js":"7mqRv","dat.gui":"67ss8","@parcel/transformer-js/src/esmodule-helpers.js":"eGNrI","./img/laCity.jpg":"cnx4k","./img/laCity2.jpg":"jBe0V"}],"ktPTu":[function(require,module,exports) {
 /**
  * @license
  * Copyright 2010-2023 Three.js Authors
@@ -36229,6 +36246,47 @@ var index = {
 };
 exports.default = index;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"eGNrI"}]},["7VrPz","1YRq9","luGQm"], "luGQm", "parcelRequire6d92")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"eGNrI"}],"cnx4k":[function(require,module,exports) {
+module.exports = require("6ca3b4b99738ca28").getBundleURL("2Lt30") + "laCity.14aa17b1.jpg" + "?" + Date.now();
+
+},{"6ca3b4b99738ca28":"lup0M"}],"lup0M":[function(require,module,exports) {
+"use strict";
+var bundleURL = {};
+function getBundleURLCached(id) {
+    var value = bundleURL[id];
+    if (!value) {
+        value = getBundleURL();
+        bundleURL[id] = value;
+    }
+    return value;
+}
+function getBundleURL() {
+    try {
+        throw new Error();
+    } catch (err) {
+        var matches = ("" + err.stack).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^)\n]+/g);
+        if (matches) // The first two stack frames will be this function and getBundleURLCached.
+        // Use the 3rd one, which will be a runtime in the original bundle.
+        return getBaseURL(matches[2]);
+    }
+    return "/";
+}
+function getBaseURL(url) {
+    return ("" + url).replace(/^((?:https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/.+)\/[^/]+$/, "$1") + "/";
+}
+// TODO: Replace uses with `new URL(url).origin` when ie11 is no longer supported.
+function getOrigin(url) {
+    var matches = ("" + url).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^/]+/);
+    if (!matches) throw new Error("Origin not found");
+    return matches[0];
+}
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+exports.getOrigin = getOrigin;
+
+},{}],"jBe0V":[function(require,module,exports) {
+module.exports = require("d545b6a9aff04cef").getBundleURL("2Lt30") + "laCity2.b3d19c3f.jpg" + "?" + Date.now();
+
+},{"d545b6a9aff04cef":"lup0M"}]},["7VrPz","1YRq9","luGQm"], "luGQm", "parcelRequire6d92")
 
 //# sourceMappingURL=index.fcbb7cd3.js.map

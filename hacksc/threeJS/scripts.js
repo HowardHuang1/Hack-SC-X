@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'dat.gui'
 
+import laCity from './img/laCity.jpg';
+import laCity2 from './img/laCity2.jpg';
+
 const renderer = new THREE.WebGLRenderer();
 
 renderer.shadowMap.enabled = true;
@@ -76,6 +79,20 @@ scene.add(dLightShadowHelper);
 // scene.add(spotLight);
 // spotLight.position.set(-100, 100, 0);
 // spotLight.castShadow = true;
+
+// renderer.setClearColor(0xFFEA00);
+const textureLoader = new THREE.TextureLoader();
+// scene.background = textureLoader.load(laCity);
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+scene.background = cubeTextureLoader.load([
+    laCity,
+    laCity2,
+    laCity,
+    laCity2,
+    laCity,
+    laCity2,
+]);
+
 
 const gui = new dat.GUI();
 
