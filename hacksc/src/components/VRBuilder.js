@@ -23,7 +23,6 @@ import {
 
 function VRBuilder() {
     const ThreeScene = () => {
-        
         const scene = useRef(new THREE.Scene());
         const camera = useRef(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000));
         const renderer = useRef(new THREE.WebGLRenderer());
@@ -86,6 +85,17 @@ function VRBuilder() {
           var mesh = new THREE.Mesh( boxGeometry, boxMaterial );
           sceneInstance.add( mesh );
               objects.push( mesh );
+
+              const nycURL = new URL('./threeJS/assets/model-0-0.glb', import.meta.url);
+              const assetLoader = new GLTFLoader();
+          
+        assetLoader.load(nycURL.href, function(gltf){
+            const model = gltf.scene;
+            sceneInstance.add(model);
+            model.position.set(-100, -100, -100);
+        }, undefined, function(error){
+            console.error(error);
+        });
 
           const geometry = new THREE.BoxGeometry();
           const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
