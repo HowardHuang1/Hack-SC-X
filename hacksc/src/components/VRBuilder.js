@@ -52,6 +52,34 @@ function VRBuilder() {
           const axesHelper = new THREE.AxesHelper(5);
           sceneInstance.add(axesHelper);
 
+          const planeGeometry = new THREE.PlaneGeometry(30, 30);
+          const planeMaterial = new THREE.MeshBasicMaterial({
+              color: 0xFFFFFF,
+              side: THREE.DoubleSide
+          });
+          const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+          sceneInstance.add(plane);
+          plane.rotation.x = -0.5 * Math.PI;
+          plane.receiveShadow = true;
+
+          const gridHelper = new THREE.GridHelper(30);
+          sceneInstance.add(gridHelper);
+          
+          const ambientLight = new THREE.AmbientLight(0x333333);
+          sceneInstance.add(ambientLight);
+          
+          const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.5);
+          sceneInstance.add(directionalLight);
+          directionalLight.position.set(-30, 50, 0);
+          directionalLight.castShadow = true;
+          directionalLight.shadow.camera.bottom = -12;
+          
+          const dLightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
+          sceneInstance.add(dLightHelper);
+          
+          const dLightShadowHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
+          sceneInstance.add(dLightShadowHelper);
+
           var boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
           var boxMaterial = new THREE.MeshNormalMaterial();
       
