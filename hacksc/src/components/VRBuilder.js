@@ -29,8 +29,6 @@ function VRBuilder() {
 
         var objects = [];
         
-        // init();
-        // animate();
         const mount = useRef(null);
       
         useEffect(() => {
@@ -98,6 +96,8 @@ function VRBuilder() {
             console.error(error);
         });
 
+        cameraInstance.position.z = 5;
+
         const cubeGeometry = new THREE.BoxGeometry(4, 8, 10);
         const material = new THREE.MeshNormalMaterial();
         const cube = new THREE.Mesh(cubeGeometry, material);
@@ -145,8 +145,6 @@ function VRBuilder() {
       
           const animate = () => {
             requestAnimationFrame(animate);
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
             rendererInstance.render(sceneInstance, cameraInstance);
           };
       
