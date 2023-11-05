@@ -1,9 +1,39 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react';
+import * as THREE from 'three';
 
-function ThreeJS() {
-  return (
-    <div>ThreeJS</div>
-  )
-}
+const ThreeJS = () => {
+  const scene = useRef(new THREE.Scene());
+  const camera = useRef(new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000));
+  const renderer = useRef(new THREE.WebGLRenderer());
 
-export default ThreeJS
+  const mount = useRef(null);
+
+  useEffect(() => {
+    const { current: cameraInstance } = camera;
+    const { current: rendererInstance } = renderer;
+    const { current: sceneInstance } = scene;
+
+    rendererInstance.setSize(window.innerWidth, window.innerHeight);
+    mount.current.appendChild(rendererInstance.domElement);
+
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry, material);
+    sceneInstance.add(cube);
+
+    cameraInstance.position.z = 5;
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+      rendererInstance.render(sceneInstance, cameraInstance);
+    };
+
+    animate();
+  }, []);
+
+  return <div ref={mount} />;
+};
+
+export default ThreeJS;
