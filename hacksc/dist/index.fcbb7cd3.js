@@ -2992,10 +2992,12 @@ const dLightHelper = new _three.DirectionalLightHelper(directionalLight, 5);
 scene.add(dLightHelper);
 const dLightShadowHelper = new _three.CameraHelper(directionalLight.shadow.camera);
 scene.add(dLightShadowHelper);
-// const spotLight = new THREE.SpotLight(0xFFFFFF);
-// scene.add(spotLight);
-// spotLight.position.set(-100, 100, 0);
-// spotLight.castShadow = true;
+const spotLight = new _three.SpotLight(0xFFFFFF);
+scene.add(spotLight);
+spotLight.position.set(-100, 100, 0);
+spotLight.castShadow = true;
+const sLightHelper = new _three.SpotLightHelper(spotLight, 5);
+scene.add(sLightHelper);
 // renderer.setClearColor(0xFFEA00);
 const textureLoader = new _three.TextureLoader();
 // scene.background = textureLoader.load(laCity);
@@ -3008,6 +3010,13 @@ scene.background = cubeTextureLoader.load([
     (0, _laCityJpgDefault.default),
     (0, _laCity2JpgDefault.default)
 ]);
+const box2Geometry = new _three.BoxGeometry(4, 4, 4);
+const box2Material = new _three.MeshBasicMaterial({
+    color: 0x00FF00
+});
+const box2 = new _three.Mesh(box2Geometry, box2Material);
+scene.add(box2);
+box2.position.set(0, 15, 10);
 const gui = new _datGui.GUI();
 const options = {
     sphereColor: "#ffea00",
@@ -3022,11 +3031,33 @@ gui.add(options, "wireframe").onChange(function(e) {
 });
 gui.add(options, "speed", 0, 0.1);
 let step = 0;
+const mousePosition = new _three.Vector2();
+window.addEventListener("mousemove", function(e) {
+    mousePosition.x = e.clientX / window.innerWidth * 2 - 1;
+    mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
+});
+const rayCaster = new _three.Raycaster();
+const sphereId = sphere.id;
+box2.name = "theBox";
 function animate(time) {
     box.rotation.x = time / 1000;
     box.rotation.y = time / 1000;
     step += options.speed;
     sphere.position.y = 10 * Math.abs(Math.sin(step));
+    spotLight.angle = options.angle;
+    spotLight.penumbra = options.penumbra;
+    spotLight.intensity = options.intensity;
+    sLightHelper.update();
+    rayCaster.setFromCamera(mousePosition, camera);
+    const intersects = rayCaster.intersectObjects(scene.children);
+    console.log(intersects);
+    for(let i = 0; i < intersects.length; i++){
+        if (intersects[i].object.id === sphereId) intersects[i].object.material.color.set(0xFF0000);
+        if (intersects[i].object.name === "theBox") {
+            intersects[i].object.rotation.x = time / 1000;
+            intersects[i].object.rotation.y = time / 1000;
+        }
+    }
     renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);

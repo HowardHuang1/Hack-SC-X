@@ -75,10 +75,13 @@ scene.add(dLightHelper);
 const dLightShadowHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
 scene.add(dLightShadowHelper);
 
-// const spotLight = new THREE.SpotLight(0xFFFFFF);
-// scene.add(spotLight);
-// spotLight.position.set(-100, 100, 0);
-// spotLight.castShadow = true;
+const spotLight = new THREE.SpotLight(0xFFFFFF);
+scene.add(spotLight);
+spotLight.position.set(-100, 100, 0);
+spotLight.castShadow = true;
+
+const sLightHelper = new THREE.SpotLightHelper(spotLight, 5);
+scene.add(sLightHelper);
 
 // renderer.setClearColor(0xFFEA00);
 const textureLoader = new THREE.TextureLoader();
@@ -93,6 +96,11 @@ scene.background = cubeTextureLoader.load([
     laCity2,
 ]);
 
+const box2Geometry = new THREE.BoxGeometry(4, 4, 4);
+const box2Material = new THREE.MeshBasicMaterial({color: 0x00FF00});
+const box2 = new THREE.Mesh(box2Geometry, box2Material);
+scene.add(box2);
+box2.position.set(0, 15, 10);
 
 const gui = new dat.GUI();
 
@@ -114,12 +122,44 @@ gui.add(options, 'speed', 0, 0.1);
 
 let step = 0;
 
+const mousePosition = new THREE.Vector2();
+
+window.addEventListener('mousemove', function(e) {
+    mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mousePosition.y = - (e.clientY / window.innerHeight) * 2 + 1;
+});
+
+const rayCaster = new THREE.Raycaster();
+
+const sphereId = sphere.id;
+box2.name = 'theBox';
+
 function animate(time){
     box.rotation.x = time / 1000;
     box.rotation.y = time / 1000;
 
     step += options.speed;
     sphere.position.y = 10 * Math.abs(Math.sin(step));
+
+    spotLight.angle = options.angle;
+    spotLight.penumbra = options.penumbra;
+    spotLight.intensity = options.intensity;
+    sLightHelper.update();
+
+    rayCaster.setFromCamera(mousePosition, camera);
+    const intersects = rayCaster.intersectObjects(scene.children);
+    console.log(intersects);
+
+    for(let i = 0; i < intersects.length; i++){
+        if(intersects[i].object.id === sphereId){
+            intersects[i].object.material.color.set(0xFF0000);
+        }
+
+        if(intersects[i].object.name === 'theBox'){
+            intersects[i].object.rotation.x = time / 1000;
+            intersects[i].object.rotation.y = time / 1000;
+        }
+    }
 
     renderer.render(scene, camera);
 }
